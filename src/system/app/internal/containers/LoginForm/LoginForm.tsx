@@ -1,4 +1,4 @@
-import { ReactElement } from 'react';
+import React, { ReactElement } from 'react';
 import { useForm } from 'react-hook-form';
 import {
   Button,
@@ -15,6 +15,13 @@ import { persistentStorage } from '../../services/persistent.storage';
 import { useNotify } from '../../useNotify';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
+import { CLIENT_ID } from '../../../../domain/constants';
+import {
+  CredentialResponse,
+  GoogleLogin,
+  GoogleOAuthProvider
+} from '@react-oauth/google';
+import { useLoginGoogleMutation } from '../../useLoginGoogleMutation';
 
 export function LoginForm(): ReactElement {
   const {
@@ -25,20 +32,8 @@ export function LoginForm(): ReactElement {
   } = useForm<LoginModel>();
   const { push } = useRouter();
   const showNotify = useNotify();
-
-  const { login } = useLogin({
-    onSuccess: credentials => {
-      persistentStorage.setAccessToken(credentials.access);
-      push('/');
-    },
-    onError: () => {
-      showNotify({
-        title: 'Incorrect username or password',
-        status: 'error'
-      });
-      reset();
-    }
-  });
+  const { loginGoogle } = useLoginGoogleMutation();
+  const { login } = useLogin();
 
   function submitResolver(model: LoginModel) {
     const loginCredentials = {
@@ -46,7 +41,33 @@ export function LoginForm(): ReactElement {
       password: model.password
     };
 
-    login(loginCredentials);
+    login(loginCredentials, {
+      onSuccess: credentials => {
+        persistentStorage.setAccessToken(credentials.accessToken);
+        push('/');
+      },
+      onError: () => {
+        showNotify({
+          title: 'Incorrect username or password',
+          status: 'error'
+        });
+        reset();
+      }
+    });
+  }
+
+  function handleLoginGoogleSuccess(credentialResponse: CredentialResponse) {
+    loginGoogle(
+      {
+        idToken: credentialResponse.credential as string
+      },
+      {
+        onSuccess: credentials => {
+          persistentStorage.setAccessToken(credentials.accessToken);
+          push('/');
+        }
+      }
+    );
   }
 
   return (
@@ -107,6 +128,18 @@ export function LoginForm(): ReactElement {
         <Text fontSize="sm" className="text-center my-5">
           <Link href={'register'}>Register now</Link>
         </Text>
+
+        <GoogleOAuthProvider clientId={CLIENT_ID}>
+          <GoogleLogin
+            onSuccess={handleLoginGoogleSuccess}
+            onError={() => {
+              showNotify({
+                title: 'Login google failed',
+                status: 'error'
+              });
+            }}
+          />
+        </GoogleOAuthProvider>
       </div>
     </>
   );

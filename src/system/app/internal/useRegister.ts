@@ -1,13 +1,10 @@
 import { useMutation } from 'react-query';
-import { RegisterUseCase } from '../../domain/usecases/auth.usecase';
 import { authClient } from './services/auth-client';
 
-export const useRegister: RegisterUseCase = ({ onError, onSuccess }) => {
+export const useRegister = () => {
   const { mutate, isLoading } = useMutation({
     mutationFn: authClient.registerByCredentials,
-    mutationKey: 'registerByCredentials',
-    onSuccess,
-    onError
+    mutationKey: 'registerByCredentials'
   });
 
   return {

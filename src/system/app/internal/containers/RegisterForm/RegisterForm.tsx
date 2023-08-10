@@ -25,19 +25,7 @@ export function RegisterForm(): ReactElement {
   const { push } = useRouter();
   const showNotify = useNotify();
 
-  const { register: registerUser } = useRegister({
-    onSuccess: credentials => {
-      persistentStorage.setAccessToken(credentials.access);
-      push('/');
-    },
-    onError: () => {
-      showNotify({
-        title: 'Duplicated username',
-        status: 'error'
-      });
-      reset();
-    }
-  });
+  const { register: registerUser } = useRegister();
 
   function submitResolver(model: LoginModel) {
     const loginCredentials = {
@@ -45,7 +33,19 @@ export function RegisterForm(): ReactElement {
       password: model.password
     };
 
-    registerUser(loginCredentials);
+    registerUser(loginCredentials, {
+      onSuccess: credentials => {
+        persistentStorage.setAccessToken(credentials.accessToken);
+        push('/');
+      },
+      onError: () => {
+        showNotify({
+          title: 'Duplicated username',
+          status: 'error'
+        });
+        reset();
+      }
+    });
   }
 
   return (

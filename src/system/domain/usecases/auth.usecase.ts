@@ -3,9 +3,12 @@ export type LoginCredentials = {
   password: string;
 };
 
+export type LoginGooglePayload = {
+  idToken: string;
+};
+
 export type UserCredentials = {
-  access: string;
-  refresh: string;
+  accessToken: string;
 };
 
 export type AuthUseCase = {
@@ -15,23 +18,10 @@ export type AuthUseCase = {
   registerByCredentials: (
     credentials: LoginCredentials
   ) => Promise<UserCredentials>;
+  loginByGoogle: (
+    loginGoogleCredentials: LoginGooglePayload
+  ) => Promise<UserCredentials>;
 };
-
-type LoginProps = {
-  onSuccess?: (credentials: UserCredentials) => void;
-  onError?: () => void;
-};
-type LoginState = {
-  login: (payload: LoginCredentials) => void;
-  isMutating: boolean;
-};
-export type LoginUseCase = (props: LoginProps) => LoginState;
-
-type RegisterState = {
-  register: (payload: LoginCredentials) => void;
-  isMutating: boolean;
-};
-export type RegisterUseCase = (props: LoginProps) => RegisterState;
 
 type LogOutState = () => void;
 export type LogOutUseCase = () => LogOutState;

@@ -1,14 +1,14 @@
 import { useMutation } from 'react-query';
 import { authClient } from './services/auth-client';
 
-export const useLogin = () => {
+export function useLoginGoogleMutation() {
   const { mutate, isLoading } = useMutation({
-    mutationFn: authClient.loginByCredentials,
-    mutationKey: 'loginByCredentials'
+    mutationFn: authClient.loginByGoogle,
+    mutationKey: 'loginByGoogle'
   });
 
   return {
-    login: mutate,
-    isMutating: isLoading
+    loginGoogle: mutate,
+    isLoading
   };
-};
+}
