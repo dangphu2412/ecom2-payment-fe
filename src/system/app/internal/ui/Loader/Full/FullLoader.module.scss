@@ -1,0 +1,5 @@
+.loader-wrapper {
+  @apply
+  fixed flex items-center justify-center bg-black opacity-60
+  h-screen w-full top-0 left-0 z-50;
+}
